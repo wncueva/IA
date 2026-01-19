@@ -82,20 +82,20 @@ export class EmpleadoController {
     }
   }
 
-  static async eliminar(req: Request, res: Response) {
-    try {
-      const ci = (req.params.ci ?? "").trim();
-      if (!ci) return res.status(400).json({ mensaje: "CI es requerido" });
+  // static async eliminar(req: Request, res: Response) {
+  //   try {
+  //     const ci = (req.params.ci ?? "").trim();
+  //     if (!ci) return res.status(400).json({ mensaje: "CI es requerido" });
 
-      const ok = await EmpleadoService.eliminar(ci);
-      if (!ok) return res.status(404).json({ mensaje: "Empleado no encontrado" });
+  //     const ok = await EmpleadoService.eliminar(ci);
+  //     if (!ok) return res.status(404).json({ mensaje: "Empleado no encontrado" });
 
-      return res.status(204).send();
-    } catch (e: any) {
-      return res.status(500).json({
-        mensaje: "Error eliminando empleado",
-        detail: e?.message,
-      });
-    }
-  }
+  //     return res.status(204).send();
+  //   } catch (e: any) {
+  //     return res.status(500).json({
+  //       mensaje: "Error eliminando empleado",
+  //       detail: e?.message,
+  //     });
+  //   }
+  // }
 }

@@ -22,7 +22,7 @@ function mapEmpleado(row: any): Empleado {
 
     salario: row.salario !== null && row.salario !== undefined ? Number(row.salario) : 0,
 
-    clave: row.clave?.trim?.() ?? row.clave ?? null,
+    // clave: row.clave?.trim?.() ?? row.clave ?? null,
   };
 }
 
@@ -32,7 +32,7 @@ export class EmpleadoRepository {
       `SELECT
         ci, nombres, apellidos, direccion, telefonos, correo,
         fecha_nacimiento, fecha_ingreso, fecha_contrato, salario,
-        id_a, id_t, id_b, id_ba, clave
+        id_a, id_t, id_b, id_ba
       FROM empleado
       ORDER BY apellidos`
     );
@@ -44,7 +44,7 @@ export class EmpleadoRepository {
       `SELECT
         ci, nombres, apellidos, direccion, telefonos, correo,
         fecha_nacimiento, fecha_ingreso, fecha_contrato, salario,
-        id_a, id_t, id_b, id_ba, clave
+        id_a, id_t, id_b, id_ba
       FROM empleado
       WHERE ci = $1`,
       [ci]
@@ -56,7 +56,7 @@ export class EmpleadoRepository {
     const result = await pool.query(
       `INSERT INTO empleado
       (ci, id_a, id_t, id_b, id_ba, nombres, apellidos, direccion, telefonos, correo,
-       fecha_nacimiento, fecha_ingreso, fecha_contrato, salario, clave)
+      fecha_nacimiento, fecha_ingreso, fecha_contrato, salario, clave)
       VALUES
       ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15)
       RETURNING
@@ -84,42 +84,56 @@ export class EmpleadoRepository {
     return mapEmpleado(result.rows[0]);
   }
 
-  static async update(ci: string, data: Empleado): Promise<Empleado | null> {
-    const result = await pool.query(
-      `UPDATE empleado SET
-        id_a=$2, id_t=$3, id_b=$4, id_ba=$5,
-        nombres=$6, apellidos=$7, direccion=$8, telefonos=$9, correo=$10,
-        fecha_nacimiento=$11, fecha_ingreso=$12, fecha_contrato=$13, salario=$14,
-        clave=$15
-      WHERE ci=$1
-      RETURNING
-        ci, nombres, apellidos, direccion, telefonos, correo,
-        fecha_nacimiento, fecha_ingreso, fecha_contrato, salario,
-        id_a, id_t, id_b, id_ba, clave`,
-      [
-        ci,
-        data.id_a ?? null,
-        data.id_t ?? null,
-        data.id_b ?? null,
-        data.id_ba ?? null,
-        data.nombres,
-        data.apellidos,
-        data.direccion,
-        data.telefonos,
-        data.correo,
-        data.fecha_nacimiento,
-        data.fecha_ingreso,
-        data.fecha_contrato,
-        data.salario,
-        data.clave ?? null,
-      ]
-    );
+  static async update(ci: string, data: Partial<Empleado>): Promise<Empleado | null> {
+    const fields: string[] = [];
+    const values: any[] = [];
+    let index = 2;
+
+    const addField = (field: string, value: any) => {
+      if (value !== undefined) {
+        fields.push(`${field}=$${index}`);
+        values.push(value);
+        index++;
+      }
+    };
+
+    addField("id_a", data.id_a);
+    addField("id_t", data.id_t);
+    addField("id_b", data.id_b);
+    addField("id_ba", data.id_ba);
+    addField("nombres", data.nombres);
+    addField("apellidos", data.apellidos);
+    addField("direccion", data.direccion);
+    addField("telefonos", data.telefonos);
+    addField("correo", data.correo);
+    addField("fecha_nacimiento", data.fecha_nacimiento);
+    addField("fecha_ingreso", data.fecha_ingreso);
+    addField("fecha_contrato", data.fecha_contrato);
+    addField("salario", data.salario);
+    addField("clave", data.clave);
+
+    if (!fields.length) {
+      return null;
+    }
+
+    const query = `
+    UPDATE empleado
+    SET ${fields.join(", ")}
+    WHERE ci=$1
+    RETURNING
+      ci, nombres, apellidos, direccion, telefonos, correo,
+      fecha_nacimiento, fecha_ingreso, fecha_contrato, salario,
+      id_a, id_t, id_b, id_ba, clave
+  `;
+
+    const result = await pool.query(query, [ci, ...values]);
     return result.rowCount ? mapEmpleado(result.rows[0]) : null;
   }
 
-  static async remove(ci: string): Promise<boolean> {
-    const result = await pool.query(`DELETE FROM empleado WHERE ci = $1`, [ci]);
-    return (result.rowCount ?? 0) > 0;
 
-  }
+  // static async remove(ci: string): Promise<boolean> {
+  //   const result = await pool.query(`DELETE FROM empleado WHERE ci = $1`, [ci]);
+  //   return (result.rowCount ?? 0) > 0;
+
+  // }
 }
