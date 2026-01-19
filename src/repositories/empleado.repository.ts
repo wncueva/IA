@@ -117,9 +117,9 @@ export class EmpleadoRepository {
     return result.rowCount ? mapEmpleado(result.rows[0]) : null;
   }
 
-  static async remove(ci: string): Promise<boolean> {
-    const result = await pool.query(`DELETE FROM empleado WHERE ci = $1`, [ci]);
-    return (result.rowCount ?? 0) > 0;
+  // static async remove(ci: string): Promise<boolean> {
+  //   const result = await pool.query(`DELETE FROM empleado WHERE ci = $1`, [ci]);
+  //   return (result.rowCount ?? 0) > 0;
 
-  }
+  // }
 }

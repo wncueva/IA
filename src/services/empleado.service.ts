@@ -18,7 +18,7 @@ export class EmpleadoService {
     return EmpleadoRepository.update(ci, data);
   }
 
-  static eliminar(ci: string): Promise<boolean> {
-    return EmpleadoRepository.remove(ci);
-  }
+  // static eliminar(ci: string): Promise<boolean> {
+  //   return EmpleadoRepository.remove(ci);
+  // }
 }
