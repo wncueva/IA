@@ -22,7 +22,7 @@ function mapEmpleado(row: any): Empleado {
 
     salario: row.salario !== null && row.salario !== undefined ? Number(row.salario) : 0,
 
-    // clave: row.clave?.trim?.() ?? row.clave ?? null,
+    clave: row.clave?.trim?.() ?? row.clave ?? null,
   };
 }
 
@@ -32,7 +32,7 @@ export class EmpleadoRepository {
       `SELECT
         ci, nombres, apellidos, direccion, telefonos, correo,
         fecha_nacimiento, fecha_ingreso, fecha_contrato, salario,
-        id_a, id_t, id_b, id_ba
+        id_a, id_t, id_b, id_ba, clave
       FROM empleado
       ORDER BY apellidos`
     );
@@ -44,7 +44,7 @@ export class EmpleadoRepository {
       `SELECT
         ci, nombres, apellidos, direccion, telefonos, correo,
         fecha_nacimiento, fecha_ingreso, fecha_contrato, salario,
-        id_a, id_t, id_b, id_ba
+        id_a, id_t, id_b, id_ba, clave
       FROM empleado
       WHERE ci = $1`,
       [ci]
@@ -56,7 +56,7 @@ export class EmpleadoRepository {
     const result = await pool.query(
       `INSERT INTO empleado
       (ci, id_a, id_t, id_b, id_ba, nombres, apellidos, direccion, telefonos, correo,
-      fecha_nacimiento, fecha_ingreso, fecha_contrato, salario, clave)
+       fecha_nacimiento, fecha_ingreso, fecha_contrato, salario, clave)
       VALUES
       ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15)
       RETURNING
@@ -130,10 +130,8 @@ export class EmpleadoRepository {
     return result.rowCount ? mapEmpleado(result.rows[0]) : null;
   }
 
-
   // static async remove(ci: string): Promise<boolean> {
   //   const result = await pool.query(`DELETE FROM empleado WHERE ci = $1`, [ci]);
   //   return (result.rowCount ?? 0) > 0;
-
   // }
 }
